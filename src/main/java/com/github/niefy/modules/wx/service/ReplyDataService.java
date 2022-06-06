@@ -21,7 +21,7 @@ public class ReplyDataService {
 
     private static final String NUM_ERROR_MSG = "编号位数有误.\n标准编号为3位,4位,11位,15位。";
 
-    private String matchValue(String key) {
+    public String matchValue(String key) {
         List<MsgReplyRule> msgReplyRules = msgReplyRuleMapper.selectList(
                 new QueryWrapper<MsgReplyRule>()
                         .eq("status", 1)

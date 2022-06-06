@@ -17,14 +17,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, MsgReplyRule> implements MsgReplyRuleService {
     @Autowired
     MsgReplyRuleMapper msgReplyRuleMapper;
-
     @Autowired
     private ReplyDataService replyDataService;
 
@@ -96,6 +94,9 @@ public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, Msg
      */
     @Override
     public List<MsgReplyRule> getMatchedRules(String appid, boolean exactMatch, String keywords) {
+        if (keywords.equals("subscribe")) {
+            return subscribe();
+        }
         String wxReply = replyDataService.getWxReply(keywords);
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(wxReply)) {
             List<MsgReplyRule> rules = new ArrayList<>();
@@ -112,6 +113,16 @@ public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, Msg
                 .filter(rule -> null == rule.getEffectTimeEnd() || rule.getEffectTimeEnd().toLocalTime().isAfter(now)) // 检测是否在有效时段，effectTimeEnd为null则一直有效
                 .filter(rule -> isMatch(exactMatch || rule.isExactMatch(), rule.getMatchValue().split(","), keywords)) //检测是否符合匹配规则
                 .collect(Collectors.toList());
+    }
+
+    private List<MsgReplyRule> subscribe() {
+        String subscribe = replyDataService.matchValue("subscribe");
+        List<MsgReplyRule> rules = new ArrayList<>();
+        MsgReplyRule msgReplyRule = new MsgReplyRule();
+        msgReplyRule.setReplyContent(subscribe);
+        msgReplyRule.setReplyType("text");
+        rules.add(msgReplyRule);
+        return rules;
     }
 
     /**
