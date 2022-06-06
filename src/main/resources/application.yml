@@ -1,19 +1,11 @@
 # Tomcat
 server:
-    tomcat:
-        uri-encoding: UTF-8
-        max-threads: 1000
-        min-spare-threads: 30
-    port: ${SERVER_PORT:8088}
-    connection-timeout: 5000ms
     servlet:
         context-path: /wx
-
+    port: 8088
 debug: false
 
 spring:
-    profiles:
-        active: ${PROFILE_ACTIVE:dev} #此处由maven的环境选择决定，参考：https://www.jianshu.com/p/b7c75b0c364c
     # jackson时间格式化
     jackson:
         time-zone: GMT+8
@@ -31,7 +23,11 @@ spring:
         scheduling:
             pool:
                 size: 5
-
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://pos9420.cn:3306/wx?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        username: root
+        password: 956836
 
 #mybatis
 mybatis-plus:

@@ -1,5 +1,10 @@
 package com.github.niefy.modules.wx.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.github.niefy.modules.wx.dao.MsgReplyRuleMapper;
+import com.github.niefy.modules.wx.entity.MsgReplyRule;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import me.chanjar.weixin.mp.util.WxMpConfigStorageHolder;
@@ -15,9 +20,10 @@ import java.util.List;
  */
 @SpringBootTest
 class TemplateMsgServiceTest {
+//    @Autowired
+//    TemplateMsgService templateMsgService;
     @Autowired
-    TemplateMsgService templateMsgService;
-
+    MsgReplyRuleMapper msgReplyRuleMapper;
     /**
      * 发送模板消息给用户
      * 添加消息模板指引：https://kf.qq.com/faq/170209E3InyI170209nIF7RJ.html
@@ -25,18 +31,11 @@ class TemplateMsgServiceTest {
      */
     @Test
     void sendTemplateMsg() {
-        String appid = WxMpConfigStorageHolder.get();
-        List<WxMpTemplateData> data  = new ArrayList<>();
-        data.add(new WxMpTemplateData("first","模板消息测试"));
-        data.add(new WxMpTemplateData("keywords1","xxxxx"));
-        data.add(new WxMpTemplateData("keywords2","xxxxx"));
-        data.add(new WxMpTemplateData("remark","点击查看消息详情"));
-        WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
-            .templateId("模板ID")
-            .url("跳转链接")
-            .toUser("用户openid")
-            .data(data)
-            .build();
-        templateMsgService.sendTemplateMsg(wxMpTemplateMessage,appid);
+        List<MsgReplyRule> msgReplyRules = msgReplyRuleMapper.selectList(
+                new QueryWrapper<MsgReplyRule>()
+                        .eq("status", 1)
+                        .eq("match_value", "情·冰封一世")
+                        .orderByDesc("priority"));
+        System.out.println(1);
     }
 }
