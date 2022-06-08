@@ -33,11 +33,14 @@ public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, Msg
         IPage<MsgReplyRule> page = this.page(
                 new Query<MsgReplyRule>().getPage(params),
                 new QueryWrapper<MsgReplyRule>()
-                        .eq(StringUtils.hasText(appid), "appid", appid)
-                        .or()
-                        .apply("appid is null or appid = ''")
+//                        .eq(StringUtils.hasText(appid), "appid", appid)
+//                        .or()
+//                        .apply("appid is null or appid = ''")
                         .like(StringUtils.hasText(matchValue), "match_value", matchValue)
+                        .or()
                         .like(StringUtils.hasText(matchValue), "reply_content", matchValue)
+                        .or()
+                        .like(StringUtils.hasText(matchValue), "rule_name", matchValue)
                         .orderByDesc("update_time")
         );
 
