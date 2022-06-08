@@ -37,6 +37,7 @@ public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, Msg
                         .or()
                         .apply("appid is null or appid = ''")
                         .like(StringUtils.hasText(matchValue), "match_value", matchValue)
+                        .like(StringUtils.hasText(matchValue), "reply_content", matchValue)
                         .orderByDesc("update_time")
         );
 
