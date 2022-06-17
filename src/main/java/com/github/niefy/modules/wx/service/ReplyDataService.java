@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.niefy.common.utils.MatchUtils;
 import com.github.niefy.modules.wx.dao.MsgReplyRuleMapper;
 import com.github.niefy.modules.wx.entity.MsgReplyRule;
+import kong.unirest.GetRequest;
+import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +43,8 @@ public class ReplyDataService {
             }
             //判断组合查询
             if (MatchUtils.isCombination(key)) {
-                return combinatorial(key);
+                GetRequest getRequest = Unirest.get("http://pos9420.cn/reply?key=" + key);
+                return getRequest.asString().getBody();
             }
             return matchValue(key);
         } else {
