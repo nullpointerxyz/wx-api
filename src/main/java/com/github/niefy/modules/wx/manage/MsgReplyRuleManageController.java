@@ -3,9 +3,15 @@ package com.github.niefy.modules.wx.manage;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.niefy.modules.wx.service.MsgReplyRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +32,7 @@ import com.github.niefy.common.utils.R;
 @RestController
 @RequestMapping("/manage/msgReplyRule")
 @Api(tags = {"自动回复规则-管理后台"})
+@Slf4j
 public class MsgReplyRuleManageController {
     @Autowired
     private MsgReplyRuleService msgReplyRuleService;
@@ -78,7 +85,14 @@ public class MsgReplyRuleManageController {
     @ApiOperation(value = "修改")
     public R update(@RequestBody MsgReplyRule msgReplyRule) {
         msgReplyRuleService.updateById(msgReplyRule);
-
+        if (msgReplyRule.getReplyType().equals(WxConsts.KefuMsgType.TEXT)){
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("keyword",msgReplyRule.getMatchValue());
+            jsonObject.put("groupName",msgReplyRule.getMatchValue());
+            jsonObject.put("reply",msgReplyRule.getReplyContent());
+            HttpResponse<String> stringHttpResponse = Unirest.post("http://www.pos9420.cn/reply").header("Content-Type", "application/json").body(jsonObject.toJSONString()).asString();
+            log.info("同步回复数据：{}", JSON.toJSONString(stringHttpResponse));
+        }
         return R.ok();
     }
 
