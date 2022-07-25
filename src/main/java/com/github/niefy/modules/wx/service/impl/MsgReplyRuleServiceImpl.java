@@ -1,5 +1,6 @@
 package com.github.niefy.modules.wx.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +10,10 @@ import com.github.niefy.modules.wx.dao.MsgReplyRuleMapper;
 import com.github.niefy.modules.wx.entity.MsgReplyRule;
 import com.github.niefy.modules.wx.service.MsgReplyRuleService;
 import com.github.niefy.modules.wx.service.ReplyDataService;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.api.WxConsts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,6 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, MsgReplyRule> implements MsgReplyRuleService {
     @Autowired
     MsgReplyRuleMapper msgReplyRuleMapper;
@@ -59,6 +65,14 @@ public class MsgReplyRuleServiceImpl extends ServiceImpl<MsgReplyRuleMapper, Msg
             msgReplyRuleMapper.updateById(msgReplyRule);
         } else {
             msgReplyRuleMapper.insert(msgReplyRule);
+        }
+        if (msgReplyRule.getReplyType().equals(WxConsts.KefuMsgType.TEXT)){
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("keyword",msgReplyRule.getMatchValue());
+            jsonObject.put("groupName",msgReplyRule.getMatchValue());
+            jsonObject.put("reply",msgReplyRule.getReplyContent());
+            HttpResponse<String> stringHttpResponse = Unirest.post("http://www.pos9420.cn/reply").header("Content-Type", "application/json").body(jsonObject.toJSONString()).asString();
+            log.info("同步回复数据：{}",stringHttpResponse);
         }
         return false;
     }
