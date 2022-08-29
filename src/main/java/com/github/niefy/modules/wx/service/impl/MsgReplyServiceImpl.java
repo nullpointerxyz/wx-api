@@ -55,7 +55,11 @@ public class MsgReplyServiceImpl implements MsgReplyService {
             log.info("收到自动回复消息：{}", keywords);
             List<MsgReplyRule> rules = msgReplyRuleService.getMatchedRules(appid, exactMatch, keywords);
             if (rules.isEmpty()) {
-                return false;
+                MsgReplyRule msgReplyRule = new MsgReplyRule();
+                msgReplyRule.setReplyType(WxConsts.KefuMsgType.TEXT);
+                msgReplyRule.setReplyContent("未被收录的信息。\n" +
+                        "欢迎添加运营微信：786458948增加这条数据！");
+                rules.add(msgReplyRule);
             }
             long delay = 0;
             for (MsgReplyRule rule : rules) {
